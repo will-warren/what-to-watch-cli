@@ -66,19 +66,6 @@ class Link:
         return self.__repr__()
 
 
-class User:
-    def __init__(self, id, user_ratings_dict):
-        self.id = id
-        self.ratings = [user_ratings_dict[rating] for rating in user_ratings_dict
-                        if rating == self.id]
-
-    def __repr__(self):
-        return "I am User {}".format(self.id)
-
-    def __str__(self):
-        return self.__repr__()
-
-
 class Calculate:
     def __init__(self, **kwargs):
         self.movies = kwargs.get('movies')
@@ -99,7 +86,7 @@ class Calculate:
         '''returns the average rating for a movie, given its ID'''
         total_ratings = self.movie_ratings[movie_id]
         return round(sum(float(r.rating) for r in total_ratings)
-                    / len(total_ratings), 3)
+                     / len(total_ratings), 3)
 
     def filter_movies(self, n):
         '''creates a list of tuples (movie title, avg rating)
@@ -108,14 +95,14 @@ class Calculate:
         for movie, rating in self.movie_ratings.items():
             if len(rating) > n:
                 movie_avgs.append((self.get_avg_rating(movie),
-                                    self.movies[movie].title))
+                                  self.movies[movie].title))
         return movie_avgs
 
     def rank_movies(self, n):
         '''returns ranked  list of movies with at least 10 ratings n movies long'''
         qualified_movies = self.filter_movies(10)
         movie_rank = sorted(qualified_movies, reverse=True)
-        return movie_rank[:5]
+        return movie_rank[:n]
 
     def find_unseen_movies(self, user_id):
         '''finds all movies a user hasn't seen, given their id'''
@@ -155,8 +142,9 @@ class Calculate:
                     most_similar_user = user
         return most_similar_user
 
-    def recommend_unseen_movies(self, userId, matched_user):
+    def recommend_unseen_movies(self, userId):
         '''recommends movies from the matched user that current user hasn't seen'''
+        matched_user = self.find_most_similar_user(userId)
         rec_movies_by_title = []
         user1_movies = set([rating.movie for rating in self.user_ratings[userId]])
         matched_user_movies = set([rating.movie for rating

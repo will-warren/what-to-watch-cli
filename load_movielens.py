@@ -54,5 +54,6 @@ def load_data():
             links[link_count] = Link(**row)
             link_count += 1
 
-    """return data as a tup of dicts"""
-    return movies, user_ratings, movie_ratings, tags, links
+    """return data as dict of dicts"""
+    return {'movies': movies, 'user_ratings': user_ratings,
+            'movie_ratings': movie_ratings, 'tags': tags, 'links': links}
