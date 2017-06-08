@@ -38,34 +38,6 @@ class Rating:
                 return self.__repr__()
 
 
-class Tag:
-    def __init__(self, **kwargs):
-        self.user = kwargs.get('userId')
-        self.movie = kwargs.get('movieId')
-        self.tag = kwargs.get('tag').split(',')
-        self.timestamp = kwargs.get('timestamp')
-
-    def __repr__(self):
-        return 'Tag({}, {}, {}, {})'.format(self.user, self.movie,
-                                            self.tag, self.timestamp)
-
-    def __str__(self):
-        return self.__repr__()
-
-
-class Link:
-    def __init__(self, **kwargs):
-        self.movie = kwargs.get('movieId')
-        self.imdb = kwargs.get('imdbId')
-        self.tmdb = kwargs.get('tmdbId')
-
-    def __repr__(self):
-        return 'Link({}, {}, {})'.format(self.movie, self.imdb, self.tmdb)
-
-    def __str__(self):
-        return self.__repr__()
-
-
 class Calculate:
     def __init__(self, **kwargs):
         self.movies = kwargs.get('movies')
@@ -88,9 +60,9 @@ class Calculate:
         return round(sum(float(r.rating) for r in total_ratings)
                      / len(total_ratings), 3)
 
-    def filter_movies(self, n):
+    def filter_movies(self, n=10):
         '''creates a list of tuples (movie title, avg rating)
-            for movies with more than n ratings'''
+            for movies with more than n ratings default is 10 ratings'''
         movie_avgs = []
         for movie, rating in self.movie_ratings.items():
             if len(rating) > n:
@@ -98,9 +70,9 @@ class Calculate:
                                   self.movies[movie].title))
         return movie_avgs
 
-    def rank_movies(self, n):
-        '''returns ranked  list of movies with at least 10 ratings n movies long'''
-        qualified_movies = self.filter_movies(10)
+    def rank_all_movies(self, n):
+        '''returns ranked list of all movies with at least 10 ratings n movies long'''
+        qualified_movies = self.filter_movies()
         movie_rank = sorted(qualified_movies, reverse=True)
         return movie_rank[:n]
 
@@ -108,6 +80,12 @@ class Calculate:
         '''finds all movies a user hasn't seen, given their id'''
         return [movie for movie in self.movies.keys()
                 if movie not in self.user_ratings[user_id]]
+
+    def rank_unseen_movies(self, user_id, n=5):
+        '''ranks unseen movies, returns top n, default set to five'''
+        unseen_movies = self.find_unseen_movies(user_id)
+        rank_unseen_movies = sorted(self.filter_movies(), reverse=True)
+        return rank_unseen_movies[:n]
 
     def get_euclidean_distance(self, user1, user2):
         """taking two lists of movies a user has seen, we find the distance between them, the distance being how similar they are on a scale from 0 to 1. 1 means 100 percent identical"""
@@ -121,7 +99,7 @@ class Calculate:
         user2_ratings_num = sorted(user2_ratings)
 
         difference = [float(user1_ratings_num[i]) - float(user2_ratings_num[i])
-                      for i in range(len(user1_ratings_num))]
+                      for i in range(min([len(user1_ratings_num), len(user2_ratings_num)]))]
 
         squares = [diff ** 2 for diff in difference]
         sum_of_squares = sum(squares)
@@ -151,5 +129,6 @@ class Calculate:
                                   in self.user_ratings[matched_user]])
         rec_list = matched_user_movies - user1_movies
         for movie in rec_list:
-            rec_movies_by_title.append(self.movies[movie])
-        return rec_movies_by_title
+            rec_movies_by_title.append((self.get_avg_rating(movie), self.movies[movie]))
+        rec_movies = sorted(rec_movies_by_title, reverse=True)
+        return rec_movies[:10]

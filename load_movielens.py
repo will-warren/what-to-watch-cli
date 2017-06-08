@@ -1,6 +1,6 @@
 # module to load movie data
 import csv
-from movielens import Movie, Rating, Tag, Link
+from movielens import Movie, Rating
 
 
 def load_data():
@@ -29,31 +29,31 @@ def load_data():
             movie_ratings.setdefault(row['movieId'], []).append(Rating(**row))
             user_ratings.setdefault(row['userId'], []).append(Rating(**row))
 
-    """load tags, tag_count acts as a primary key"""
-
-    tag_path = 'tags.csv'
-    tags = {}
-    tag_count = 0
-    with open(tag_path, encoding='latin-1') as f:
-        reader = csv.DictReader(f, delimiter=',',
-                                fieldnames=['userId', 'movieId',
-                                            'tag', 'timestamp'])
-        for row in reader:
-            tags[tag_count] = Tag(**row)
-            tag_count += 1
-
-    """load links, link_count acts as primary key"""
-
-    link_path = 'links.csv'
-    links = {}
-    link_count = 0
-    with open(link_path, encoding='latin-1') as f:
-        reader = csv.DictReader(f, delimiter=',',
-                                fieldnames=['movieId', 'imdbId', 'tmdbId'])
-        for row in reader:
-            links[link_count] = Link(**row)
-            link_count += 1
+    # """load tags, tag_count acts as a primary key"""
+    #
+    # tag_path = 'tags.csv'
+    # tags = {}
+    # tag_count = 0
+    # with open(tag_path, encoding='latin-1') as f:
+    #     reader = csv.DictReader(f, delimiter=',',
+    #                             fieldnames=['userId', 'movieId',
+    #                                         'tag', 'timestamp'])
+    #     for row in reader:
+    #         tags[tag_count] = Tag(**row)
+    #         tag_count += 1
+    #
+    # """load links, link_count acts as primary key"""
+    #
+    # link_path = 'links.csv'
+    # links = {}
+    # link_count = 0
+    # with open(link_path, encoding='latin-1') as f:
+    #     reader = csv.DictReader(f, delimiter=',',
+    #                             fieldnames=['movieId', 'imdbId', 'tmdbId'])
+    #     for row in reader:
+    #         links[link_count] = Link(**row)
+    #         link_count += 1
 
     """return data as dict of dicts"""
     return {'movies': movies, 'user_ratings': user_ratings,
-            'movie_ratings': movie_ratings, 'tags': tags, 'links': links}
+            'movie_ratings': movie_ratings}
