@@ -77,12 +77,16 @@ class Calculate:
         return movie_rank[:n]
 
     def find_unseen_movies(self, user_id):
-        '''finds all movies a user hasn't seen, given their id'''
-        return [movie for movie in self.movies.keys()
-                if movie not in self.user_ratings[user_id]]
+        '''returns all movies a user hasn't seen, given their id'''
+        unseen_movies = []
+        for rating in self.user_ratings[user_id]:
+            for movie in self.movies.keys():
+                if movie != rating.movie:
+                    unseen_movies.append(self.movies[movie])
+        return unseen_movies
 
-    def rank_unseen_movies(self, user_id, n=5):
-        '''ranks unseen movies, returns top n, default set to five'''
+    def rank_unseen_movies(self, user_id, n=10):
+        '''ranks unseen movies, returns top n, default set to 10'''
         unseen_movies = self.find_unseen_movies(user_id)
         rank_unseen_movies = sorted(self.filter_movies(), reverse=True)
         return rank_unseen_movies[:n]
