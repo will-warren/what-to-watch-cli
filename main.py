@@ -13,7 +13,7 @@ def main():
         'links': links
     }
     c = Calculate(**data)
-    print(c.rank_movies(25))
+    print(c.recommend_unseen_movies('1', '524'))
 
 
 main()
